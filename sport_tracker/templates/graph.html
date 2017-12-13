@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>SportTracker</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+    <link rel="stylesheet/less" type="text/css" href="{{ url_for('static',filename='styles/custom.less') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src='/static/js/Chart.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="everything nope">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="welcome">Welcome to SportTracker</div>
+                    <div class="welcome">- A Social Media Analzyer for College Athletics -</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <form action="{{ url_for('graph') }}" method="post">
+                        <label class="control-label text">- Upload Game Day Tweet Data Here - </label>
+                        <input id="input-1" type="file" class="file" name="file">
+                        <input type="submit" value="submit">
+                    </form>
+                </div>
+                <div class="col-xs-6">
+                    <canvas id="chart" width="600" height="400"></canvas>
+                </div>
+            </div>
+            <div class="row">
+                <img id="logo" class="img-responsive" src="../static/images/logo.png">
+            </div>
+        </div>
+    </div>
+    <script>
+        // data/labels for bar chart from Python variable rendered in the template
+        var barData = {
+            labels: [{ %
+                    for item in labels %
+                }
+                "{{item}}", { % endfor %
+                }
+            ],
+            datasets: [{
+                data: [{ %
+                    for item in values %
+                } {
+                    {
+                        item
+                    }
+                }, { % endfor %
+                }],
+                backgroundColor: 'rgba(0,0,0,.8)',
+                //Choosing border color for wins vs. losses
+                borderColor: [{ %
+                        for item in wls %
+                    } { %
+                        if item == 'W' %
+                    }
+                    'rgba(50,205,50,1)', { %
+                        else %
+                    }
+                    'rgba(128,0,0,1)', { % endif %
+                    } { % endfor %
+                    }
+                ],
+                borderWidth: 1
+            }]
+        }
+
+        // get bar chart canvas DOM element by its ID
+        var ctx = document.getElementById("chart").getContext("2d");
+
+        //Variable for chart settings
+        steps = 10;
+        max = 10;
+        // Create chart object with required settings
+        var myBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: barData,
+            scaleOverride: true,
+            scaleSteps: steps,
+            scaleStepWidth: Math.ceil(max / steps),
+            scaleStartValue: 0,
+            scaleShowVerticalLines: true,
+            scaleShowGridLines: true,
+            barShowStroke: true,
+            scaleShowLabels: true,
+            options: {
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            autoSkip: false,
+                            fontColor: "white"
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Opponent",
+                            fontColor: "#FFFFFF"
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            fontColor: "white",
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Number of Tweets",
+                            fontColor: "#FFFFFF"
+                        }
+                    }],
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

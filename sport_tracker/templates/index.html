@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>SportTracker</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+    <link rel="stylesheet/less" type="text/css" href="{{ url_for('static',filename='styles/custom.less') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="everything nope">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="welcome">Welcome to SportTracker</div>
+                    <div class="welcome">- A Social Media Analzyer for College Athletics -</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6" align="center">
+                    <form action="{{ url_for('run') }}" name="form" method="POST">
+                        <div class="formTitle">Year:</div>
+                        <div class="tooltip-bg">
+                            <div class="tip"></div>
+                            <input type="text" name="year" placeholder="type here" id="speech-input">
+                        </div> <br>
+                        <div class="formTitle">School:</div>
+                        <select class="form" name="options">
+                    {% for link,o in option_list.items() %}
+                        {%if link == sport %}
+                        <option value="{{link}}" selected>{{o}}</option>
+                        {% endif %}
+                        <option value="{{link}}">{{o}}</option>
+                    {% endfor %}
+                    </select> <br>
+                        <label for="cfb">Football
+                        <input type="checkbox" id="cfb" name="sport" value="cfb">
+                    </label>
+                        <label for="cbb">Men's Basketball
+                        <input type="checkbox" id="cbb" name="sport" value="cbb">
+                    </label><br>
+                        <button id="submit" type="submit" value="submit" name="options">Submit School</button>
+                    </form>
+                    <form action="{{ url_for('command') }}" name="process">
+                        <button action="{{ url_for('command') }}" class="butt" id="process" type="submit" value="process" name="">Process Data</button>
+                    </form>
+                    <form action="{{ url_for('graph') }}" name="graph">
+                        <button action="{{ url_for('graph') }}" class="butt" id="submit" type="submit" value="graph" name="">Graph Data</button>
+                    </form>
+                    {% if error %}
+                    <div class="error">{{error + school_name + '.'}}</div>{% endif %} {% if data is not none %}
+                </div>
+                <div class="col-xs-6" align="center">
+                    <span class="school">{{school_name}}</span>
+                    <span class="school">{{year}}</span>
+                    <div class="data">{{data|safe}}</div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="row">
+                <div class="col-xs-6" align="center">
+                    {% if load == True %}
+                    <div class="loader"></div>
+                    <div class="loaderDots">Analzing Tweets for {{school_name}}
+                        <span class="loader__dot">.</span>
+                        <span class="loader__dot">.</span>
+                        <span class="loader__dot">.</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-xs-6" align="center">
+                    <img id="logo" class="img-responsive" src="../static/images/logo.png">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        //Changes year input when clicked on
+        $(document).ready(function() {
+            $("#formYear").click(function() {
+                $(this).toggleClass("tooltip-bg", 1000);
+                $("#tip").toggleClass("tip", 1000);
+                $("#speech-input").toggleClass("speech-input", 1000);
+            })
+        });
+        //Alerts the user that texts are now being scraped
+        var submit = document.getElementById('process');
+        submit.onclick = function() {
+            alert("Tweets are now being collected for your school!")
+        };
+    </script>
+</body>
+
+</html>
